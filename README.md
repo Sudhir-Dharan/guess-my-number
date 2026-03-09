@@ -10,22 +10,22 @@ A clean Flutter web game where players guess a secret number between 1 and 100.
 ## Local Development
 ```bash
 # Get dependencies
-/home/clawadmin/.openclaw/tools/flutter/bin/flutter pub get
+flutter pub get
 
 # Run in Chrome
-/home/clawadmin/.openclaw/tools/flutter/bin/flutter run -d chrome
+flutter run -d chrome
 ```
 
 ## Build for Web
 ```bash
-/home/clawadmin/.openclaw/tools/flutter/bin/flutter build web
+flutter build web
 ```
 This outputs static files in `build/web/`.
 
 ## Deploy Options
 ### 1) GitHub Pages
 ```bash
-/home/clawadmin/.openclaw/tools/flutter/bin/flutter build web --base-href "/guess-my-number/"
+flutter build web --base-href "/guess-my-number/"
 ```
 Then deploy the `build/web` folder to GitHub Pages (e.g., via a `gh-pages` branch or GitHub Actions).
 
