@@ -1,10 +1,12 @@
 # Guess My Number (Flutter Web)
 
-A clean Flutter web game where players guess a secret number between 1 and 100.
+A Flutter web game where you choose a secret number and play human vs computer. First to guess correctly wins.
 
 ## Features
-- Flutter web UI with responsive layout
-- Best score saved in browser localStorage
+- Human vs computer guessing game
+- Higher/lower visual clues
+- Round history with both guesses
+- Responsive Flutter web UI
 - Keyboard support (Enter to submit)
 
 ## Install Flutter
