@@ -278,20 +278,32 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 6),
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(width: 70, child: Text('Round ${r.round}')),
                                     Expanded(
-                                      child: Row(
+                                      child: Wrap(
+                                        spacing: 16,
+                                        runSpacing: 6,
                                         children: [
-                                          const Text('You: '),
-                                          Text('${r.userGuess}'),
-                                          const SizedBox(width: 6),
-                                          HintIcon(r.userHint),
-                                          const SizedBox(width: 16),
-                                          const Text('Computer: '),
-                                          Text('${r.computerGuess}'),
-                                          const SizedBox(width: 6),
-                                          HintIcon(r.computerHint),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text('You: '),
+                                              Text('${r.userGuess}'),
+                                              const SizedBox(width: 6),
+                                              HintIcon(r.userHint),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text('Computer: '),
+                                              Text('${r.computerGuess}'),
+                                              const SizedBox(width: 6),
+                                              HintIcon(r.computerHint),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                     ),
