@@ -7,6 +7,20 @@ A clean Flutter web game where players guess a secret number between 1 and 100.
 - Best score saved in browser localStorage
 - Keyboard support (Enter to submit)
 
+## Install Flutter
+Follow the official docs for your OS:
+- https://docs.flutter.dev/get-started/install
+
+Quick overview:
+- **macOS:** `brew install --cask flutter`
+- **Windows:** download the Flutter SDK zip, add `flutter/bin` to PATH
+- **Linux:** download the Flutter SDK tarball, add `flutter/bin` to PATH
+
+Verify:
+```bash
+flutter --version
+```
+
 ## Local Development
 ```bash
 # Get dependencies
