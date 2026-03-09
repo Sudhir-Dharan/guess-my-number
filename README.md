@@ -1,6 +1,6 @@
 # Guess My Number (Flutter Web)
 
-A Flutter web game where you choose a secret number and play human vs computer. First to guess correctly wins.
+A Flutter web game where you and the computer each choose secret numbers. You guess its number, it guesses yours. First to guess correctly wins.
 
 ## Features
 - Human vs computer guessing game

@@ -37,37 +37,45 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
   final TextEditingController _secretController = TextEditingController();
   final TextEditingController _guessController = TextEditingController();
 
-  int? _secret;
+  int? _userSecret;
+  int? _computerSecret;
   int _round = 0;
   int _computerMin = min;
   int _computerMax = max;
   bool _gameOver = false;
-  String _status = 'Set a secret number to start.';
+  String _status = 'Set your secret number to start.';
 
   final List<RoundResult> _history = [];
 
   void _startGame() {
     final value = int.tryParse(_secretController.text.trim());
     if (value == null || value < min || value > max) {
-      _setStatus('Enter a secret number between $min and $max.', Colors.amber);
+      _setStatus('Enter a secret number between $min and $max.');
       return;
     }
 
+    int compSecret = Random().nextInt(max - min + 1) + min;
+    while (compSecret == value) {
+      compSecret = Random().nextInt(max - min + 1) + min;
+    }
+
     setState(() {
-      _secret = value;
+      _userSecret = value;
+      _computerSecret = compSecret;
       _round = 0;
       _computerMin = min;
       _computerMax = max;
       _history.clear();
       _gameOver = false;
       _guessController.clear();
-      _status = 'Game on. You and the computer will guess each round.';
+      _status = 'Game on. You guess the computer’s number. It guesses yours.';
     });
   }
 
   void _reset() {
     setState(() {
-      _secret = null;
+      _userSecret = null;
+      _computerSecret = null;
       _round = 0;
       _computerMin = min;
       _computerMax = max;
@@ -75,29 +83,29 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
       _gameOver = false;
       _secretController.clear();
       _guessController.clear();
-      _status = 'Set a secret number to start.';
+      _status = 'Set your secret number to start.';
     });
   }
 
-  void _setStatus(String text, Color color) {
+  void _setStatus(String text) {
     setState(() {
       _status = text;
     });
   }
 
   void _playRound() {
-    if (_secret == null || _gameOver) return;
+    if (_userSecret == null || _computerSecret == null || _gameOver) return;
 
     final userGuess = int.tryParse(_guessController.text.trim());
     if (userGuess == null || userGuess < min || userGuess > max) {
-      _setStatus('Enter your guess between $min and $max.', Colors.amber);
+      _setStatus('Enter your guess between $min and $max.');
       return;
     }
 
     final compGuess = (_computerMin + _computerMax) ~/ 2;
 
-    final userHint = _hintFor(userGuess, _secret!);
-    final compHint = _hintFor(compGuess, _secret!);
+    final userHint = _hintFor(userGuess, _computerSecret!);
+    final compHint = _hintFor(compGuess, _userSecret!);
 
     setState(() {
       _round += 1;
@@ -119,7 +127,7 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
         _status = 'It is a tie. Both guessed correctly!';
         _gameOver = true;
       } else if (userHint == Hint.correct) {
-        _status = 'You win. You guessed it first.';
+        _status = 'You win. You guessed the computer’s number first.';
         _gameOver = true;
       } else if (compHint == Hint.correct) {
         _status = 'Computer wins. It guessed your number.';
@@ -150,7 +158,7 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
         alignment: Alignment.center,
         padding: const EdgeInsets.all(24),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
+          constraints: const BoxConstraints(maxWidth: 960),
           child: Card(
             color: const Color(0xFF111827),
             elevation: 12,
@@ -167,7 +175,7 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'You choose a secret number. You and the computer take turns guessing. First correct guess wins.',
+                    'You both choose secret numbers. You guess the computer’s number, it guesses yours. First correct guess wins.',
                     style: TextStyle(color: Color(0xFF9CA3AF)),
                   ),
                   const SizedBox(height: 16),
@@ -177,88 +185,138 @@ class _GuessMyNumberPageState extends State<GuessMyNumberPage> {
                     children: [
                       _StatChip(label: 'Round', value: _round.toString()),
                       _StatChip(label: 'Computer range', value: '$_computerMin - $_computerMax'),
-                      _StatChip(label: 'Secret', value: _secret == null ? 'Not set' : 'Locked'),
+                      _StatChip(label: 'Your secret', value: _userSecret == null ? 'Not set' : 'Locked'),
+                      _StatChip(label: 'Computer secret', value: _computerSecret == null ? 'Not set' : 'Hidden'),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  if (_secret == null) ...[
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        SizedBox(
-                          width: 220,
-                          child: TextField(
-                            controller: _secretController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'Set secret (1-100)',
-                              filled: true,
-                              fillColor: const Color(0xFF0B1020),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Color(0xFF1F2937)),
-                              ),
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: _startGame,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            backgroundColor: const Color(0xFF22C55E),
-                            foregroundColor: const Color(0xFF052E16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text('Start Game'),
-                        ),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0B1020),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF1F2937)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text('How to play', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 6),
+                        Text('1) Set your secret number (1–100).'),
+                        Text('2) Computer picks its secret (different from yours).'),
+                        Text('3) Each round: you guess its number, it guesses yours.'),
+                        Text('4) Use the arrows to see higher/lower hints.'),
+                        Text('5) First correct guess wins the game.'),
                       ],
                     ),
-                  ] else ...[
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        SizedBox(
-                          width: 220,
-                          child: TextField(
-                            controller: _guessController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'Your guess (1-100)',
-                              filled: true,
-                              fillColor: const Color(0xFF0B1020),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Color(0xFF1F2937)),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0B1020),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF1F2937)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Your secret (for computer)', style: TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 8),
+                              TextField(
+                                controller: _secretController,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: 'Set secret (1-100)',
+                                  filled: true,
+                                  fillColor: const Color(0xFF111827),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(color: Color(0xFF1F2937)),
+                                  ),
+                                ),
+                                enabled: _userSecret == null,
                               ),
-                            ),
-                            onSubmitted: (_) => _playRound(),
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: _userSecret == null ? _startGame : null,
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                  backgroundColor: const Color(0xFF22C55E),
+                                  foregroundColor: const Color(0xFF052E16),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: Text(_userSecret == null ? 'Lock Secret' : 'Locked'),
+                              ),
+                            ],
                           ),
                         ),
-                        ElevatedButton(
-                          onPressed: _playRound,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            backgroundColor: const Color(0xFF22C55E),
-                            foregroundColor: const Color(0xFF052E16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0B1020),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF1F2937)),
                           ),
-                          child: const Text('Play Round'),
-                        ),
-                        OutlinedButton(
-                          onPressed: _reset,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            foregroundColor: const Color(0xFFE5E7EB),
-                            side: const BorderSide(color: Color(0xFF1F2937)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Your guess (for computer’s number)', style: TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 8),
+                              TextField(
+                                controller: _guessController,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: 'Your guess (1-100)',
+                                  filled: true,
+                                  fillColor: const Color(0xFF111827),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(color: Color(0xFF1F2937)),
+                                  ),
+                                ),
+                                onSubmitted: (_) => _playRound(),
+                                enabled: _userSecret != null && !_gameOver,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: (_userSecret != null && !_gameOver) ? _playRound : null,
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                      backgroundColor: const Color(0xFF22C55E),
+                                      foregroundColor: const Color(0xFF052E16),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    child: const Text('Play Round'),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  OutlinedButton(
+                                    onPressed: _reset,
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                      foregroundColor: const Color(0xFFE5E7EB),
+                                      side: const BorderSide(color: Color(0xFF1F2937)),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    child: const Text('Reset'),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          child: const Text('Reset'),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   Text(_status, style: const TextStyle(fontSize: 16, color: Color(0xFFE5E7EB))),
                   const SizedBox(height: 16),
