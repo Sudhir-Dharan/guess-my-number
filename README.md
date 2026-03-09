@@ -1,40 +1,53 @@
-# Guess My Number
+# Guess My Number (Flutter Web)
 
-A clean, single‑file browser game where players guess a secret number between 1 and 100. Designed to be easy to embed on a blog site.
+A clean Flutter web game where players guess a secret number between 1 and 100.
 
 ## Features
-- Single HTML file (drop‑in anywhere)
-- Responsive UI
-- Best score saved in localStorage
+- Flutter web UI with responsive layout
+- Best score saved in browser localStorage
 - Keyboard support (Enter to submit)
 
-## How to Run
-**Option 1: Just open the file**
-1. Download `index.html`
-2. Double‑click it to open in your browser
-
-**Option 2: Run a local server (optional)**
+## Local Development
 ```bash
-# Python
-python -m http.server 8000
+# Get dependencies
+/home/clawadmin/.openclaw/tools/flutter/bin/flutter pub get
 
-# Or Node
-npx serve .
+# Run in Chrome
+/home/clawadmin/.openclaw/tools/flutter/bin/flutter run -d chrome
 ```
-Then open `http://localhost:8000`.
+
+## Build for Web
+```bash
+/home/clawadmin/.openclaw/tools/flutter/bin/flutter build web
+```
+This outputs static files in `build/web/`.
+
+## Deploy Options
+### 1) GitHub Pages
+```bash
+/home/clawadmin/.openclaw/tools/flutter/bin/flutter build web --base-href "/guess-my-number/"
+```
+Then deploy the `build/web` folder to GitHub Pages (e.g., via a `gh-pages` branch or GitHub Actions).
+
+### 2) Vercel
+- Build command: `flutter build web`
+- Output directory: `build/web`
+
+### 3) Netlify
+- Build command: `flutter build web`
+- Publish directory: `build/web`
 
 ## Security Note
 Because the game runs entirely in the browser, the secret number exists in JavaScript memory. A user can inspect or debug the page to discover it. This is normal for client‑side games. If you need a truly hidden number, you must generate and validate guesses on a server.
 
-## Theme Ideas (to make it more interesting)
-- **Retro arcade**: pixel fonts, CRT glow, synthwave colors
-- **Cricket stadium**: guesses as runs, crowd reactions for hints
-- **Space mission**: guess the launch code, oxygen bar as attempts
-- **Treasure hunt**: map animation, closer/farther heat hints
-- **Minimal Zen**: monochrome palette, subtle sounds
-- **Daily challenge**: one number per day, share results
-- **Timed mode**: countdown clock, bonus points for speed
-- **Multiplayer pass‑and‑play**: two players alternate guesses
+## Theme Ideas
+- Retro arcade: pixel fonts, CRT glow
+- Cricket stadium: guesses as runs
+- Space mission: guess the launch code
+- Treasure hunt: heat‑map hints
+- Daily challenge mode
+- Timed mode
+- Multiplayer pass‑and‑play
 
 ## License
 MIT
